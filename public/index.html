@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shortify – Turn Long URLs into Short, Simple Links</title>
+  <meta name="description" content="Shortify transforms clumsy long links into sleek, memorable short URLs. Track real-time visitor stats with instant privacy-friendly analytics." />
+  
+  <!-- Google Fonts: Plus Jakarta Sans (Editorial modern sans-serif) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Background Ambient Glows & Subtle Shapes -->
+  <div class="bg-decorations" aria-hidden="true">
+    <div class="glow-orb orb-1"></div>
+    <div class="glow-orb orb-2"></div>
+    <div class="deco-ring ring-1"></div>
+    <div class="deco-dot dot-orange"></div>
+    <div class="deco-dot dot-green"></div>
+  </div>
+
+  <!-- =============================================
+       1. NAVIGATION BAR (Pill Shaped & Modern)
+       ============================================= -->
+  <header class="navbar-wrapper">
+    <nav class="navbar" aria-label="Main Navigation">
+      <a href="#hero" class="nav-brand">
+        <span class="brand-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+          </svg>
+        </span>
+        <span class="brand-name">Shortify</span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="#hero" class="nav-link active">Home</a></li>
+        <li><a href="#how-it-works" class="nav-link">How It Works</a></li>
+        <li><a href="#stats-nav" class="nav-link" id="navStatsLink" onclick="handleNavStats(event)">Statistics</a></li>
+      </ul>
+
+      <div class="nav-cta-wrapper">
+        <a href="#urlInput" class="btn-nav-cta" onclick="focusShortener(event)">Get Started</a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- =============================================
+       2. HERO SECTION (Asymmetric Editorial Layout)
+       ============================================= -->
+  <main>
+    <section id="hero" class="hero-section">
+      <div class="hero-container">
+        
+        <!-- Left Column: Copy & Shortener Form -->
+        <div class="hero-content hero-enter-left">
+          <div class="hero-pill-badge">
+            <span class="badge-dot"></span>
+            <span>Simple, Fast & Secure URL Shortener</span>
+          </div>
+
+          <h1 class="hero-headline">
+            Make Your Links<br />
+            <span class="headline-accent">Short &amp; Simple.</span>
+          </h1>
+
+          <p class="hero-subtitle">
+            Transform long URLs into clean, shareable links in seconds. Track clicks and visitor insights in real-time.
+          </p>
+
+          <!-- Premium Input Card Form -->
+          <div class="shortener-card" id="shortenerBox">
+            <div class="input-wrapper">
+              <span class="input-icon" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                </svg>
+              </span>
+              <input
+                type="url"
+                id="urlInput"
+                placeholder="Paste your long URL here..."
+                autocomplete="off"
+                aria-label="URL to shorten"
+              />
+              <button id="shortenBtn" onclick="shortenURL()" class="btn-shorten" aria-label="Shorten URL">
+                <span id="btnText">Shorten URL <span class="btn-arrow" aria-hidden="true">→</span></span>
+                <span id="btnSpinner" class="spinner hidden" aria-hidden="true"></span>
+              </button>
+            </div>
+
+            <!-- Error Message -->
+            <p id="errorMsg" class="error-msg hidden" role="alert"></p>
+
+            <!-- Result Box (shown after successful shortening) -->
+            <div id="resultBox" class="result-box hidden">
+              <div class="result-header">
+                <span class="result-sparkle">✨</span>
+                <span class="result-label">Your link is ready!</span>
+              </div>
+              <div class="result-card-inner">
+                <div class="result-link-display">
+                  <span class="link-icon-mini" aria-hidden="true">🔗</span>
+                  <a id="shortLink" href="#" target="_blank" class="short-link" rel="noopener noreferrer"></a>
+                </div>
+                <div class="result-actions">
+                  <button id="copyBtn" onclick="copyURL()" class="btn-action btn-copy" aria-label="Copy short link">
+                    <span class="action-icon">📋</span> Copy
+                  </button>
+                  <button id="statsBtn" onclick="showStats()" class="btn-action btn-stats" aria-label="View link statistics">
+                    <span class="action-icon">📊</span> Stats
+                  </button>
+                </div>
+              </div>
+              <p id="copyMsg" class="copy-msg hidden">✓ Copied to clipboard!</p>
+            </div>
+          </div>
+
+          <!-- Feature Trust Badges -->
+          <div class="hero-trust-row">
+            <div class="trust-item">
+              <span class="trust-icon">⚡</span>
+              <span>Instant Redirect</span>
+            </div>
+            <div class="trust-divider"></div>
+            <div class="trust-item">
+              <span class="trust-icon">🔒</span>
+              <span>Masked IP Privacy</span>
+            </div>
+            <div class="trust-divider"></div>
+            <div class="trust-item">
+              <span class="trust-icon">📈</span>
+              <span>Live Click Stats</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Pure CSS Floating Visual Composition -->
+        <div class="hero-visual hero-enter-right" aria-hidden="true">
+          <div class="visual-canvas">
+            
+            <!-- Central Main URL Card -->
+            <div class="central-card floating-card">
+              <div class="card-top-bar">
+                <div class="browser-dots">
+                  <span class="dot red"></span>
+                  <span class="dot yellow"></span>
+                  <span class="dot green"></span>
+                </div>
+                <div class="card-domain-badge">shortify.link</div>
+                <div class="card-status-indicator">
+                  <span class="status-pulse"></span>
+                  <span class="status-text">Active</span>
+                </div>
+              </div>
+
+              <div class="card-link-content">
+                <div class="link-icon-badge">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                  </svg>
+                </div>
+                <div class="link-details">
+                  <span class="link-label">Shortified Link</span>
+                  <span class="link-url-text">shortify/aB72xK <span class="external-arrow">↗</span></span>
+                </div>
+              </div>
+
+              <div class="card-destination-preview">
+                <span class="dest-icon">↳</span>
+                <span class="dest-url">github.com/project-showcase/launch-2026/dbms...</span>
+              </div>
+
+              <!-- Mini visual activity sparkline -->
+              <div class="card-sparkline-row">
+                <div class="sparkline-info">
+                  <span class="sparkline-label">Recent Traffic</span>
+                  <span class="sparkline-val">+42% this hour</span>
+                </div>
+                <div class="sparkline-bars">
+                  <span class="bar h-40"></span>
+                  <span class="bar h-65"></span>
+                  <span class="bar h-45"></span>
+                  <span class="bar h-85"></span>
+                  <span class="bar h-70"></span>
+                  <span class="bar h-100 highlight"></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Floating Satellite Badge 1: 24 Clicks -->
+            <div class="satellite-badge badge-clicks floating-badge-1">
+              <div class="badge-icon-orange">📈</div>
+              <div class="badge-meta">
+                <span class="badge-number">24 Clicks</span>
+                <span class="badge-sub">Live &amp; Counting</span>
+              </div>
+            </div>
+
+            <!-- Floating Satellite Badge 2: Fast & Simple -->
+            <div class="satellite-badge badge-fast floating-badge-2">
+              <span class="badge-emoji">⚡</span>
+              <span class="badge-strong">Fast &amp; Simple</span>
+            </div>
+
+            <!-- Floating Satellite Badge 3: 🔒 Secure -->
+            <div class="satellite-badge badge-secure floating-badge-3">
+              <span class="badge-emoji">🔒</span>
+              <div class="badge-meta">
+                <span class="badge-strong">Secure Link</span>
+                <span class="badge-sub">SQLite Protected</span>
+              </div>
+            </div>
+
+            <!-- Floating Satellite Badge 4: Copied! -->
+            <div class="satellite-badge badge-copied floating-badge-4">
+              <span class="badge-check">✓</span>
+              <span class="badge-strong">Copied!</span>
+            </div>
+
+            <!-- Background Decorative Rings in Visual -->
+            <div class="visual-decor-circle"></div>
+            <div class="visual-accent-dot"></div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- =============================================
+         3. HOW IT WORKS SECTION (Editorial 3-Card Grid)
+         ============================================= -->
+    <section id="how-it-works" class="section-works">
+      <div class="works-container">
+        
+        <div class="section-header reveal">
+          <div class="section-tag">HOW IT WORKS</div>
+          <h2 class="section-title">Shorten Any Link in Three Steps</h2>
+          <p class="section-desc">Fast, intuitive, and built for simplicity. No complex setups or endless configurations.</p>
+        </div>
+
+        <div class="cards-grid">
+          
+          <!-- Step 1 Card -->
+          <article class="step-card reveal delay-1">
+            <div class="card-step-num">01</div>
+            <div class="step-icon-wrap">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+              </svg>
+            </div>
+            <h3 class="step-title">Paste</h3>
+            <p class="step-text">
+              Paste your long, cumbersome destination URL into the field above.
+            </p>
+            <div class="step-footer-pill">Any valid web link</div>
+          </article>
+
+          <!-- Step 2 Card -->
+          <article class="step-card step-card-featured reveal delay-2">
+            <div class="card-step-num accent-num">02</div>
+            <div class="step-icon-wrap icon-accent">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+              </svg>
+            </div>
+            <h3 class="step-title">Shorten</h3>
+            <p class="step-text">
+              Shortify generates a unique 6-character code and stores it in SQLite instantly.
+            </p>
+            <div class="step-footer-pill pill-accent">Sub-millisecond speed</div>
+          </article>
+
+          <!-- Step 3 Card -->
+          <article class="step-card reveal delay-3">
+            <div class="card-step-num">03</div>
+            <div class="step-icon-wrap">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="18" cy="5" r="3"></circle>
+                <circle cx="6" cy="12" r="3"></circle>
+                <circle cx="18" cy="19" r="3"></circle>
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+              </svg>
+            </div>
+            <h3 class="step-title">Share</h3>
+            <p class="step-text">
+              Copy and share your new link anywhere. Track visitors and live clicks whenever you want.
+            </p>
+            <div class="step-footer-pill">Live visitor statistics</div>
+          </article>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- =============================================
+         4. DEEP GREEN CALL TO ACTION (CTA) SECTION
+         ============================================= -->
+    <section class="section-cta reveal">
+      <div class="cta-container">
+        <div class="cta-inner">
+          <div class="cta-shapes" aria-hidden="true">
+            <div class="cta-shape-circle"></div>
+            <div class="cta-shape-ring"></div>
+          </div>
+          <div class="cta-content">
+            <span class="cta-tag">GET STARTED TODAY</span>
+            <h2 class="cta-title">Ready to shorten your next link?</h2>
+            <p class="cta-desc">
+              Experience simple, fast, and privacy-first URL shortening with live click tracking.
+            </p>
+            <a href="#urlInput" class="btn-cta-primary" onclick="focusShortener(event)">
+              Shorten a URL <span class="btn-arrow" aria-hidden="true">→</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- =============================================
+       5. FOOTER (Minimal & Elegant)
+       ============================================= -->
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <span class="footer-logo-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+            </svg>
+          </span>
+          <span class="footer-brand-title">SHORTIFY</span>
+        </div>
+        <p class="footer-tagline">“Long URLs out. Simple links in.”</p>
+      </div>
+
+      <div class="footer-bottom">
+        <p class="footer-copy">© 2026 Shortify. Built for College DBMS Mini Project.</p>
+        <p class="footer-tech">Express • SQLite • Vanilla JS</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- =============================================
+       6. REDESIGNED STATISTICS MODAL
+       Preserves all IDs and functionality from original
+       ============================================= -->
+  <div id="statsOverlay" class="modal-overlay hidden" onclick="closeStatsOnOverlay(event)" role="dialog" aria-modal="true" aria-labelledby="statsTitle">
+    <div class="modal-dialog">
+
+      <!-- Deep Forest Green Modal Header -->
+      <div class="modal-header">
+        <div class="modal-header-left">
+          <span class="modal-header-icon" aria-hidden="true">📊</span>
+          <div>
+            <h2 id="statsTitle" class="modal-title">LINK STATISTICS</h2>
+            <p class="modal-subtitle">Real-time visitor &amp; click analytics</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" onclick="closeStats()" aria-label="Close statistics dialog">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="modal-body">
+        
+        <!-- Target Short URL Row -->
+        <div class="stats-url-card">
+          <span class="stats-label">Short URL:</span>
+          <a id="statsShortLink" href="#" target="_blank" class="stats-short-link" rel="noopener noreferrer"></a>
+        </div>
+
+        <!-- Big Highlight Counter for Total Clicks -->
+        <div class="stats-counter-banner">
+          <div class="counter-text-group">
+            <span class="counter-title">Total Clicks</span>
+            <span class="counter-desc">Total visits routed through this short code</span>
+          </div>
+          <span id="statsTotalClicks" class="counter-big-number">—</span>
+        </div>
+
+        <!-- Dynamic State Containers -->
+        <div id="statsLoading" class="modal-state-msg">
+          <div class="spinner-state"></div>
+          <span>Loading analytics data...</span>
+        </div>
+
+        <p id="statsError" class="modal-error-msg hidden" role="alert"></p>
+
+        <!-- Click Details Table Wrapper -->
+        <div id="statsTableWrapper" class="stats-table-section hidden">
+          <div class="table-heading-row">
+            <h3 class="table-section-title">Recent Visitors</h3>
+            <span class="table-badge">Last 20 Clicks</span>
+          </div>
+
+          <div class="table-scroll-container">
+            <table class="modern-stats-table">
+              <thead>
+                <tr>
+                  <th scope="col">Time</th>
+                  <th scope="col">Browser / Device</th>
+                  <th scope="col">Referrer</th>
+                </tr>
+              </thead>
+              <tbody id="statsTableBody"></tbody>
+            </table>
+          </div>
+
+          <p class="modal-privacy-note">
+            <span class="privacy-icon">🔒</span>
+            <span>Visitor IP addresses are masked to preserve privacy. Data stored in SQLite.</span>
+          </p>
+        </div>
+
+        <!-- Zero clicks empty state -->
+        <div id="statsNoClicks" class="modal-empty-state hidden">
+          <span class="empty-icon">🌱</span>
+          <p class="empty-title">No clicks recorded yet</p>
+          <p class="empty-desc">Share your shortened link to start collecting live visitor metrics!</p>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="modal-footer">
+        <button class="btn-modal-dismiss" onclick="closeStats()">Close Statistics</button>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
