@@ -51,7 +51,8 @@ pool.query(`
     original_url TEXT    NOT NULL,
     short_code   TEXT    NOT NULL UNIQUE,
     created_at   TEXT    NOT NULL
-  )
+  );
+  ALTER TABLE urls ADD COLUMN IF NOT EXISTS expires_at TEXT;
 `).catch(err => console.error('urls table error:', err.message));
 
 pool.query(`
@@ -133,7 +134,7 @@ app.get('/health', (req, res) => {
 // 7. POST /shorten  – Create a short URL (unchanged)
 // -----------------------------------------------
 app.post('/shorten', (req, res) => {
-  const { originalURL } = req.body;
+  const { originalURL, expiresIn } = req.body;
 
   // Validate: URL must not be empty
   if (!originalURL || originalURL.trim() === '') {
@@ -149,16 +150,24 @@ app.post('/shorten', (req, res) => {
 
   const shortCode = generateShortCode();
   const createdAt = new Date().toISOString();
+  
+  let expiresAt = null;
+  if (expiresIn && expiresIn !== 'never') {
+    const hours = parseInt(expiresIn, 10);
+    if (!isNaN(hours)) {
+      expiresAt = new Date(Date.now() + hours * 60 * 60 * 1000).toISOString();
+    }
+  }
 
   // Save to database
-  const sql = 'INSERT INTO urls (original_url, short_code, created_at) VALUES ($1, $2, $3)';
-  pool.query(sql, [originalURL, shortCode, createdAt], function (err) {
+  const sql = 'INSERT INTO urls (original_url, short_code, created_at, expires_at) VALUES ($1, $2, $3, $4)';
+  pool.query(sql, [originalURL, shortCode, createdAt, expiresAt], function (err) {
     const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
     
     if (err) {
       if (err.code === '23505') { // PostgreSQL unique constraint violation error code
         const newCode = generateShortCode();
-        pool.query(sql, [originalURL, newCode, createdAt], function (err2) {
+        pool.query(sql, [originalURL, newCode, createdAt, expiresAt], function (err2) {
           if (err2) return res.status(500).json({ error: 'Database error. Please try again.' });
           return res.json({ shortURL: `${baseUrl}/${newCode}` });
         });
@@ -218,13 +227,12 @@ app.get('/stats/:shortCode', (req, res) => {
 app.get('/:shortCode', (req, res) => {
   const { shortCode } = req.params;
 
-  pool.query('SELECT original_url FROM urls WHERE short_code = $1', [shortCode], (err, rowRes) => {
+  pool.query('SELECT original_url, expires_at FROM urls WHERE short_code = $1', [shortCode], (err, rowRes) => {
     if (err) {
       return res.status(500).send('Database error.');
     }
 
-    if (rowRes.rowCount === 0) {
-      // Short code not found – show a simple 404 page
+    const show404 = (reason) => {
       return res.status(404).send(`
         <!DOCTYPE html>
         <html lang="en">
@@ -242,21 +250,29 @@ app.get('/:shortCode', (req, res) => {
           </style>
         </head>
         <body>
-          <h2>404 – Short URL Not Found</h2>
-          <p>The short code "<strong>${shortCode}</strong>" does not exist.</p>
+          <h2>404 – Short URL ${reason}</h2>
+          <p>The short code "<strong>${shortCode}</strong>" is invalid or expired.</p>
           <a href="/">← Go back to Shortify</a>
         </body>
         </html>
       `);
+    };
+
+    if (rowRes.rowCount === 0) {
+      return show404('Not Found');
     }
 
+    const { original_url, expires_at } = rowRes.rows[0];
+
+    // Check expiration
+    if (expires_at && new Date() > new Date(expires_at)) {
+      return show404('Expired');
+    }
     // --- Record the click in the clicks table ---
     const ip        = req.ip;
     const userAgent = req.headers['user-agent'] || null;
     const referrer  = req.headers['referer'] || null;
     const clickedAt = new Date().toISOString();
-
-    const original_url = rowRes.rows[0].original_url;
 
     pool.query(
       'INSERT INTO clicks (short_code, ip_address, user_agent, referrer, clicked_at) VALUES ($1, $2, $3, $4, $5)',

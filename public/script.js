@@ -18,6 +18,7 @@ async function shortenURL() {
   const copyMsg    = document.getElementById('copyMsg');
 
   const originalURL = input.value.trim();
+  const expiresIn   = document.getElementById('expirationSelect')?.value || 'never';
 
   // Hide previous results / errors
   errorMsg.classList.add('hidden');
@@ -47,7 +48,7 @@ async function shortenURL() {
     const response = await fetch('/shorten', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ originalURL })
+      body: JSON.stringify({ originalURL, expiresIn })
     });
 
     const data = await response.json();
