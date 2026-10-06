@@ -81,12 +81,9 @@ app.use(express.static(path.join(__dirname, 'public')));   // Serve frontend
 // 4. Helper: Generate a random 6-character short code
 // -----------------------------------------------
 function generateShortCode() {
-  const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  let code = '';
-  for (let i = 0; i < 6; i++) {
-    code += chars[Math.floor(Math.random() * chars.length)];
-  }
-  return code;
+  const crypto = require('crypto');
+  // Generate 4 random bytes and convert to a base64url string, then slice to 6 chars
+  return crypto.randomBytes(4).toString('base64url').slice(0, 6);
 }
 
 // -----------------------------------------------
