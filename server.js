@@ -32,6 +32,11 @@ const pool = new Pool({
   ssl: isLocalhost ? false : { rejectUnauthorized: false }
 });
 
+// Handle idle connection errors (important for Neon Postgres)
+pool.on('error', (err, client) => {
+  console.error('Unexpected error on idle PostgreSQL client:', err.message);
+});
+
 pool.connect((err) => {
   if (err) {
     console.error('Could not connect to PostgreSQL database:', err.message);
