@@ -77,6 +77,18 @@ pool.query(`
 app.use(express.json());                                    // Parse JSON bodies
 app.use(express.static(path.join(__dirname, 'public')));   // Serve frontend
 
+const rateLimit = require('express-rate-limit');
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per window
+  standardHeaders: true, 
+  legacyHeaders: false,
+  message: { error: 'Too many requests from this IP, please try again after 15 minutes.' }
+});
+
+// Apply rate limiter specifically to the URL creation endpoint to prevent spam
+app.use('/shorten', apiLimiter);
+
 // -----------------------------------------------
 // 4. Helper: Generate a random 6-character short code
 // -----------------------------------------------
